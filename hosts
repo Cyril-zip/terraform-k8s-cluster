@@ -1,0 +1,4 @@
+10.0.0.10 k8smaster.example.net k8smaster
+10.0.0.11 k8sworker1.example.net k8sworker1
+10.0.0.12 k8sworker2.example.net k8sworker2
+10.0.0.13 k8sworker3.example.net k8sworker3

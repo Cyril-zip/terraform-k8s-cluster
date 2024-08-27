@@ -4,7 +4,7 @@
 # IMPORTANT - This runs on the Control Plane node
 # Output of each command is given in the curly braces to compare with your output and detect issues in case of mismatch
 #
-sudo kubeadm init --pod-network-cidr 192.168.0.0/16
+sudo kubeadm init --control-plane-endpoint=k8smaster.example.net --pod-network-cidr=192.168.0.0/16
 
 # Save 'kubeadm join ...' command from the above output to run in next step on the Worker Nodes
 # Or get it by running 'kubeadm token create --print-join-command' on the Control Plane Node later
@@ -20,13 +20,13 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 # https://kubernetes.io/docs/concepts/cluster-administration/addons/
 
 # Install the Tigera Calico operator and custom resource definitions.
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
+# kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.1/manifests/tigera-operator.yaml
 
 # Install Calico by creating the necessary custom resource. 
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/custom-resources.yaml
+# kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.1/manifests/custom-resources.yaml
 
 # FYI, install the calicoctl CLI tool to manage Calico resources and perform administrative functions following the link:
 # https://docs.tigera.io/calico/3.25/operations/calicoctl/install
 
 # Test Control Plane node. Expected to be in Ready state this time
-kubectl get nodes
+# kubectl get nodes

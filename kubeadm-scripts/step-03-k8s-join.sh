@@ -1,1 +1,2 @@
-sudo kubeadm join 172.31.9.0:6443 --token v4im8e.r2bsa65p0fl4etju --discovery-token-ca-cert-hash sha256:ca8701588f4ea690f08c864444d9f2de102d0351b5068a5a40859edf0615760e 
+sudo kubeadm join k8smaster.example.net:6443 --token wvblco.3cxen93m0n6m4dw3 \
+        --discovery-token-ca-cert-hash sha256:4e0dc7e850d88241a2872c5fa7dbd059247776ce97b9a699d067fff86ac5fd7b

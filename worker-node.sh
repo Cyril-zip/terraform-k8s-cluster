@@ -53,3 +53,6 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 sudo apt update
 sudo apt install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
+
+sudo kubeadm join k8smaster.example.net:6443 --token slufsr.crc8unc1d0hgphwn \
+        --discovery-token-ca-cert-hash sha256:d619ede39f82b0dedf4975eb4924fbb7c2e6b818c394e91c43acf85bbc7797d7
