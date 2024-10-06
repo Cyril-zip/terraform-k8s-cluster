@@ -4,15 +4,15 @@
 # IMPORTANT - This runs on the Control Plane node
 # Output of each command is given in the curly braces to compare with your output and detect issues in case of mismatch
 #
-sudo kubeadm init --control-plane-endpoint=k8smaster.example.net --pod-network-cidr=192.168.0.0/16
+sudo kubeadm init --control-plane-endpoint=k8smaster.example.net --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address 11.0.0.10
 
 # Save 'kubeadm join ...' command from the above output to run in next step on the Worker Nodes
 # Or get it by running 'kubeadm token create --print-join-command' on the Control Plane Node later
 
 # Setup cluster config following the previous command output
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+mkdir -p $HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+sudo kubeadm token create --print-join-command
 
 # Install the Calico Network Add-On on the Control Plane node
 # Reference: https://docs.tigera.io/calico/3.25/getting-started/kubernetes/quickstart

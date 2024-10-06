@@ -9,6 +9,12 @@ variable "worker_node_count" {
   default     = 3
 }
 
+variable "availability_zone" {
+  description = "Availability zone of subnet"
+  type        = string
+  default     = "us-east-1a"
+}
+
 variable "control_plane_node_tags" {
   description = "Tags for Control Plane node instance"
   type        = map(string)
@@ -23,15 +29,18 @@ variable "worker_nodes" {
   default = [
     {
       Name       = "k8s-worker-node-1",
-      private_ip = "10.0.0.11"
+      private_ip = "11.0.0.11"
+      hostname   = "k8sworker1.example.net"
     },
     {
       Name       = "k8s-worker-node-2",
-      private_ip = "10.0.0.12"
+      private_ip = "11.0.0.12",
+      hostname   = "k8sworker2.example.net"
     },
     {
       Name       = "k8s-worker-node-3",
-      private_ip = "10.0.0.13"
+      private_ip = "11.0.0.13",
+      hostname   = "k8sworker3.example.net"
     }
   ]
 }
@@ -51,11 +60,18 @@ variable "ami_id" {
   default     = "ami-0a0e5d9c7acc336f1"
 }
 
-variable "instance_type" {
+variable "cp_instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "t3.large"
+  default     = "t3a.large"
 }
+
+variable "worker_node_instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t3a.medium"
+}
+
 
 variable "sg_worker_node_tags" {
   description = "Tags for Security Group (Worker node)"

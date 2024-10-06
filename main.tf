@@ -43,7 +43,7 @@ resource "aws_key_pair" "cp_k8s_ec2_key_pair" {
 }
 
 resource "aws_vpc" "cp_k8s_vpc" {
-  cidr_block           = "10.0.0.0/22"
+  cidr_block           = "11.0.0.0/22"
   enable_dns_support   = true
   enable_dns_hostnames = true
 
@@ -53,8 +53,9 @@ resource "aws_vpc" "cp_k8s_vpc" {
 }
 
 resource "aws_subnet" "cp_k8s_subnet" {
-  vpc_id     = aws_vpc.cp_k8s_vpc.id
-  cidr_block = "10.0.0.0/24"
+  vpc_id            = aws_vpc.cp_k8s_vpc.id
+  cidr_block        = "11.0.0.0/24"
+  availability_zone = var.availability_zone
 
   tags = {
     Name = "cp_k8s_subnet"
@@ -110,7 +111,7 @@ resource "aws_security_group" "cp_k8s_ec2_sg_control_plane" {
   }
 
   ingress {
-    description = "TCP"
+    description = "Kubernetes API"
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
@@ -195,11 +196,11 @@ resource "aws_instance" "cp_k8s_ec2_instance_control_plane_node" {
   depends_on = [
     aws_subnet.cp_k8s_subnet
   ]
-  ami           = var.ami_id
-  subnet_id     = aws_subnet.cp_k8s_subnet.id
-  instance_type = var.instance_type
-  key_name      = aws_key_pair.cp_k8s_ec2_key_pair.key_name
-  private_ip                  = "10.0.0.10"
+  ami                         = var.ami_id
+  subnet_id                   = aws_subnet.cp_k8s_subnet.id
+  instance_type               = var.cp_instance_type
+  key_name                    = aws_key_pair.cp_k8s_ec2_key_pair.key_name
+  private_ip                  = "11.0.0.10"
   vpc_security_group_ids      = [aws_security_group.cp_k8s_ec2_sg_control_plane.id]
   associate_public_ip_address = true
 
@@ -212,19 +213,19 @@ resource "aws_instance" "cp_k8s_ec2_instance_control_plane_node" {
     # Schedule = "stop_when_I_sleep"
   }
 
-  # connection {
-  #   type        = "ssh"
-  #   user        = "ec2-user"
-  #   private_key = tls_private_key.rsa_key.private_key_openssh
-  #   host        = self.public_ip
-  # }
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = tls_private_key.rsa_key.private_key_openssh
+    host        = self.public_ip
+  }
 
-  # provisioner "remote-exec" {
-  #   scripts = [
-  #     "./kubeadm-scripts/step-01-k8s-packages.sh",
-  #     "./kubeadm-scripts/step-02-k8s-cp-init.sh",
-  #   ]
-  # }
+  provisioner "remote-exec" {
+    scripts = [
+      "./kubeadm-scripts/step-01-k8s-packages.sh",
+      # "./kubeadm-scripts/step-02-k8s-cp-init.sh",
+    ]
+  }
   # provisioner "local-exec" {
   #   command = <<-EOT
   #     join_cmd=$(ssh ec2-user@${self.public_ip} -o StrictHostKeyChecking=no -i ${local.pem_file} "kubeadm token create --print-join-command")
@@ -251,10 +252,10 @@ resource "aws_instance" "cp_k8s_ec2_instance_worker_node" {
 
   for_each = { for idx, worker_node in var.worker_nodes : idx => worker_node }
 
-  ami           = var.ami_id
-  subnet_id     = aws_subnet.cp_k8s_subnet.id
-  instance_type = var.instance_type
-  key_name      = aws_key_pair.cp_k8s_ec2_key_pair.key_name
+  ami                         = var.ami_id
+  subnet_id                   = aws_subnet.cp_k8s_subnet.id
+  instance_type               = var.worker_node_instance_type
+  key_name                    = aws_key_pair.cp_k8s_ec2_key_pair.key_name
   private_ip                  = each.value.private_ip
   vpc_security_group_ids      = [aws_security_group.cp_k8s_ec2_sg_worker_nodes.id]
   associate_public_ip_address = true
@@ -268,17 +269,17 @@ resource "aws_instance" "cp_k8s_ec2_instance_worker_node" {
     var.worker_node_tags
   )
 
-  # connection {
-  #   type        = "ssh"
-  #   user        = "ec2-user"
-  #   private_key = tls_private_key.rsa_key.private_key_openssh
-  #   host        = self.public_ip
-  # }
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = tls_private_key.rsa_key.private_key_openssh
+    host        = self.public_ip
+  }
 
-  # provisioner "remote-exec" {
-  #   scripts = [
-  #     "./kubeadm-scripts/step-01-k8s-packages.sh",
-  #     "./kubeadm-scripts/step-03-k8s-join.sh",
-  #   ]
-  # }
+  provisioner "remote-exec" {
+    scripts = [
+      "./kubeadm-scripts/step-01-k8s-packages.sh",
+      # "./kubeadm-scripts/step-03-k8s-join.sh",
+    ]
+  }
 }

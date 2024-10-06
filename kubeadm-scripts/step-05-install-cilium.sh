@@ -1,0 +1,1 @@
+cilium install --set ipam.mode=cluster-pool --set ipam.operator.clusterPoolIPv4PodCIDRList=192.168.0.0/16 --set ipam.operator.clusterPoolIPv4MaskSize=24
